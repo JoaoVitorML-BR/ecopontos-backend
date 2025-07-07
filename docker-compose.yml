@@ -25,7 +25,7 @@ services:
     environment:
       MONGO_URI: mongodb://${DB_USER}:${DB_PASS}@mongodb:27017/${DB_NAME}?authSource=admin
     ports:
-      - "3000:3000"
+      - "3001:3001"
     volumes:
       - .:/app
     command: npm run start:dev
