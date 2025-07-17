@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { EcoPointsModule } from './modules/ecopoints/ecopoints.module';
 import { UsersModule } from './modules/users/users.module';
 import { ExternalModule } from './modules/external/external.module';
+import { AuthModule } from './modules/auth/auth.module';
 import { CommonModule } from './common/common.module';
 
 @Module({
@@ -13,6 +14,7 @@ import { CommonModule } from './common/common.module';
       process.env.MONGO_URI || 'mongodb://localhost:27017/eco_arapiraca'
     ),
     CommonModule,
+    AuthModule,
     EcoPointsModule,
     UsersModule,
     ExternalModule,

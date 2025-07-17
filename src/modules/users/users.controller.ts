@@ -1,23 +1,58 @@
-import { 
-  Controller, 
-  Get, 
+import {
+  Body,
+  Controller,
+  Get,
   Param,
+  Post,
+  Put,
   UsePipes,
-  ValidationPipe 
+  ValidationPipe
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 
 @Controller('users')
 @UsePipes(new ValidationPipe({ transform: true }))
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  @Put(':id')
+  async updateUser(
+    @Param('id') id: string,
+    @Body() updateData: any
+  ) {
+    const updatedUser = await this.usersService.update(id, updateData);
+    return {
+      id: updatedUser._id.toString(),
+      name: updatedUser.name,
+      email: updatedUser.email,
+      role: updatedUser.role,
+      createdAt: updatedUser.createdAt,
+      updatedAt: updatedUser.updatedAt
+    };
+  }
+  constructor(private readonly usersService: UsersService) { }
+
+  @Get()
+  async findAll() {
+    const users = await this.usersService.findAll();
+    return users.map(user => ({
+      id: user._id.toString(),
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt
+    }));
+  }
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const user = await this.usersService.findById(id);
     return {
       id: user._id.toString(),
-      name: user.name
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt
     };
   }
 
