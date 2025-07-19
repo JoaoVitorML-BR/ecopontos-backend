@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -76,5 +77,11 @@ export class UsersController {
       isValid,
       message: isValid ? 'Usuário válido' : 'Usuário não encontrado'
     };
+  }
+
+  @Delete(':id')
+  async deleteUser(@Param('id') id: string) {
+    await this.usersService.remove(id);
+    return { message: 'Usuário excluído com sucesso' };
   }
 }
