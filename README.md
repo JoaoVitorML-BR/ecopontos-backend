@@ -20,7 +20,7 @@ Backend desenvolvido em NestJS para o projeto Eco Arapiraca.
 
 1. Clone o repositório:
 ```bash
-git clone <url-do-repositorio>
+git clone https://github.com/JoaoVitorML-BR/ecopontos-backend.git
 cd eco_arapiraca_backend_nest
 ```
 
