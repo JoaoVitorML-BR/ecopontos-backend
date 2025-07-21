@@ -29,6 +29,20 @@ cd eco_arapiraca_backend_nest
 cp .env.example .env
 ```
 
+conteudo das variaveis:
+
+```
+# Configurações do Banco de Dados MongoDB
+DB_USER=admin
+DB_PASS=12345
+DB_NAME=eco_arapiraca
+
+# Configurações da Aplicação
+NODE_ENV=development
+PORT=3001
+```
+
+
 3. Edite o arquivo `.env` com suas configurações.
 
 ## Executando com Docker (Recomendado)
