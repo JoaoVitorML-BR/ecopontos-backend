@@ -9,6 +9,7 @@ export type UserDocument = User & Document & {
 export enum UserRole {
   ADMIN = 'admin',
   USER = 'user',
+  ENTERPRISE = 'enterprise'
 }
 
 @Schema({
@@ -26,6 +27,9 @@ export class User {
 
   @Prop({ type: String, enum: UserRole, default: UserRole.USER })
   role: UserRole;
+
+  @Prop({ default: undefined })
+  approved?: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
