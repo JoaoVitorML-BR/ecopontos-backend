@@ -12,7 +12,7 @@ export class AuthController {
   constructor(
     private authService: AuthService,
     private usersService: UsersService,
-  ) {}
+  ) { }
 
   @Post('register')
   async register(@Body() registerDto: RegisterDto) {
@@ -20,11 +20,18 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard, AdminGuard)
-  @Post('register-user')
-  async registerUser(@Body() registerDto: RegisterDto) {
+  @Post('register-enterprise')
+  async registerEnterprise(@Body() registerDto: RegisterDto) {
+    const userData = { ...registerDto, role: 'enterprise', approved: false };
+    return this.authService.registerEnterprise(userData);
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Post('register-admin')
+  async registerAdmin(@Body() registerDto: RegisterDto) {
     const userData = {
       ...registerDto,
-      role: 'user',
+      role: 'admin',
     };
     return this.authService.registerUserByAdmin(userData);
   }

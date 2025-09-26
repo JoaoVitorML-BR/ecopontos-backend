@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { UserRole } from '../users/schemas/user.schema';
@@ -11,7 +11,7 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
-  ) {}
+  ) { }
 
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.usersService.findByEmail(email);
@@ -27,7 +27,7 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('Credenciais inválidas');
     }
-    
+
     const payload = { email: user.email, sub: user._id, role: user.role };
     return {
       access_token: this.jwtService.sign(payload),
@@ -46,20 +46,20 @@ export class AuthService {
 
     const existingUser = await this.usersService.findByEmail(registerDto.email);
     if (existingUser) {
-      throw new UnauthorizedException('Email já está em uso');
+      throw new ConflictException('Email já está em uso');
     }
 
     const hashedPassword = await bcrypt.hash(registerDto.password, 10);
-    
+
     const userData = {
       ...registerDto,
       password: hashedPassword,
       role: isFirstUser ? UserRole.ADMIN : UserRole.USER,
     };
-    
+
     const user = await this.usersService.create(userData);
     const { password, ...result } = user.toObject();
-    
+
     const payload = { email: user.email, sub: user._id, role: user.role };
     return {
       access_token: this.jwtService.sign(payload),
@@ -70,22 +70,46 @@ export class AuthService {
   async registerUserByAdmin(userData: any) {
     const existingUser = await this.usersService.findByEmail(userData.email);
     if (existingUser) {
-      throw new UnauthorizedException('Email já está em uso');
+      throw new ConflictException('Email já está em uso');
     }
 
     const hashedPassword = await bcrypt.hash(userData.password, 10);
-    
+
     const userDataWithHash = {
       ...userData,
       password: hashedPassword,
       role: UserRole.USER,
     };
-    
+
     const user = await this.usersService.create(userDataWithHash);
     const { password, ...result } = user.toObject();
-    
+
     return {
       message: 'Usuário criado com sucesso',
+      user: result,
+    };
+  }
+
+  async registerEnterprise(registerDto: RegisterDto) {
+    const existingUser = await this.usersService.findByEmail(registerDto.email);
+    if (existingUser) {
+      throw new ConflictException('Email já está em uso');
+    }
+
+    const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+    const userData = {
+      ...registerDto,
+      password: hashedPassword,
+      role: UserRole.ENTERPRISE,
+      approved: false,
+    };
+
+    const user = await this.usersService.create(userData);
+    const { password, ...result } = user.toObject();
+
+    const payload = { email: user.email, sub: user._id, role: user.role };
+    return {
+      access_token: this.jwtService.sign(payload),
       user: result,
     };
   }
