@@ -9,10 +9,14 @@ import { CreateUserDto } from './dto/create-user.dto';
 export class UsersService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>
-  ) {}
+  ) { }
 
   async create(createUserDto: CreateUserDto): Promise<UserDocument> {
-    const user = new this.userModel(createUserDto);
+    let userData: any = { ...createUserDto };
+    if (userData.role === 'enterprise') {
+      userData.approved = false;
+    }
+    const user = new this.userModel(userData);
     return user.save();
   }
 
@@ -71,15 +75,13 @@ export class UsersService {
 
   async createDefaultAdmin(): Promise<void> {
     try {
-      const existingAdmin = await this.userModel.findOne({ 
-        role: 'admin' 
+      const existingAdmin = await this.userModel.findOne({
+        role: 'admin'
       }).exec();
-      
+
       if (!existingAdmin) {
-        console.log('Criando usuário admin padrão...');
-        
         const hashedPassword = await bcrypt.hash('123456', 10);
-        
+
         const admin = new this.userModel({
           name: 'Admin',
           email: 'admin@admin.com',
@@ -88,9 +90,6 @@ export class UsersService {
         });
 
         await admin.save();
-        console.log('Admin criado com sucesso!');
-        console.log('Email: admin@admin.com');
-        console.log('Senha: 123456');
       } else {
         console.log('Admin já existe no sistema');
       }
