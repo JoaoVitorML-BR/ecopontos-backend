@@ -2,35 +2,27 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   Param,
   Post,
   Put,
+  Req,
+  UseGuards,
   UsePipes,
   ValidationPipe
 } from '@nestjs/common';
 import { UsersService } from './users.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { AdminGuard } from '../auth/guards/admin.guard';
 
 @Controller('users')
 @UsePipes(new ValidationPipe({ transform: true }))
 export class UsersController {
-  @Put(':id')
-  async updateUser(
-    @Param('id') id: string,
-    @Body() updateData: any
-  ) {
-    const updatedUser = await this.usersService.update(id, updateData);
-    return {
-      id: updatedUser._id.toString(),
-      name: updatedUser.name,
-      email: updatedUser.email,
-      role: updatedUser.role,
-      createdAt: updatedUser.createdAt,
-      updatedAt: updatedUser.updatedAt
-    };
-  }
   constructor(private readonly usersService: UsersService) { }
 
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Get()
   async findAll() {
     const users = await this.usersService.findAll();
@@ -44,8 +36,13 @@ export class UsersController {
     }));
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: string, @Req() req) {
+    const isAuth = req.user;
+    if (!isAuth || (isAuth.userId !== id && isAuth.role !== 'admin')) {
+      throw new ForbiddenException('Você não tem permissão para acessar este usuário.');
+    }
     const user = await this.usersService.findById(id);
     return {
       id: user._id.toString(),
@@ -57,8 +54,13 @@ export class UsersController {
     };
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('name/:name')
-  async findByName(@Param('name') name: string) {
+  async findByName(@Param('name') name: string, @Req() req) {
+    const isAuth = req.user;
+    if (!isAuth || (isAuth.role !== 'admin')) {
+      throw new ForbiddenException('Você não tem permissão para acessar este usuário.');
+    }
     const user = await this.usersService.findByName(name);
     if (!user) {
       return { message: 'Usuário não encontrado' };
@@ -70,7 +72,11 @@ export class UsersController {
   }
 
   @Get('validate/:id')
-  async validateUser(@Param('id') id: string) {
+  async validateUser(@Param('id') id: string, @Req() req) {
+    const isAuth = req.user;
+    if (!isAuth || (isAuth.userId !== id && isAuth.role !== 'admin')) {
+      throw new ForbiddenException('Você não tem permissão para acessar este usuário.');
+    }
     const isValid = await this.usersService.validateUser(id);
     return {
       userId: id,
@@ -79,9 +85,37 @@ export class UsersController {
     };
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  async deleteUser(@Param('id') id: string) {
+  async deleteUser(@Param('id') id: string, @Req() req) {
+    const user = req.user;
+    if (user.userId !== id && user.role !== 'admin') {
+      throw new ForbiddenException('Você não tem permissão para deletar este usuário.');
+    }
+
     await this.usersService.remove(id);
     return { message: 'Usuário excluído com sucesso' };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put(':id')
+  async updateUser(
+    @Param('id') id: string,
+    @Body() updateData: UpdateUserDto,
+    @Req() req
+  ) {
+    const user = req.user;
+    if (user.userId !== id && user.role !== 'admin') {
+      throw new ForbiddenException('Você não tem permissão para atualizar este usuário.');
+    }
+    const updatedUser = await this.usersService.update(id, updateData);
+    return {
+      id: updatedUser._id.toString(),
+      name: updatedUser.name,
+      email: updatedUser.email,
+      role: updatedUser.role,
+      createdAt: updatedUser.createdAt,
+      updatedAt: updatedUser.updatedAt
+    };
   }
 }
