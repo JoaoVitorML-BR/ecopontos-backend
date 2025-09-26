@@ -4,17 +4,16 @@ import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class HttpClientService {
-  constructor(private readonly httpService: HttpService) {}
+  constructor(private readonly httpService: HttpService) { }
 
   private cleanCnpj(cnpj: string): string {
-    // Remove todos os caracteres não numéricos
     return cnpj.replace(/\D/g, '');
   }
 
   async validateCnpj(cnpj: string) {
     try {
       const cleanedCnpj = this.cleanCnpj(cnpj);
-      
+
       if (cleanedCnpj.length !== 14) {
         throw new Error('CNPJ deve ter 14 dígitos');
       }
