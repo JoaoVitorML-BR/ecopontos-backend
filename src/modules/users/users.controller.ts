@@ -22,7 +22,6 @@ import { AdminGuard } from '../auth/guards/admin.guard';
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
-  @UseGuards(JwtAuthGuard, AdminGuard)
   @Get()
   async findAll() {
     const users = await this.usersService.findAll();
@@ -72,11 +71,7 @@ export class UsersController {
   }
 
   @Get('validate/:id')
-  async validateUser(@Param('id') id: string, @Req() req) {
-    const isAuth = req.user;
-    if (!isAuth || (isAuth.userId !== id && isAuth.role !== 'admin')) {
-      throw new ForbiddenException('Você não tem permissão para acessar este usuário.');
-    }
+  async validateUser(@Param('id') id: string) {
     const isValid = await this.usersService.validateUser(id);
     return {
       userId: id,
@@ -117,5 +112,23 @@ export class UsersController {
       createdAt: updatedUser.createdAt,
       updatedAt: updatedUser.updatedAt
     };
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Get('role/admin')
+  async getAdmins() {
+    return this.usersService.findByRole('admin');
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Get('role/user')
+  async getClients() {
+    return this.usersService.findByRole('user');
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Get('role/enterprise')
+  async getEnterprises() {
+    return this.usersService.findByRole('enterprise');
   }
 }
