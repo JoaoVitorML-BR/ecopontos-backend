@@ -3,8 +3,8 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { UserRole } from '../users/schemas/user.schema';
 import * as bcrypt from 'bcryptjs';
-import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { CreateUserDto } from '../users/dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -15,6 +15,7 @@ export class AuthService {
 
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.usersService.findByEmail(email);
+    console.log(user);
     if (user && await bcrypt.compare(password, user.password)) {
       const { password, ...result } = user.toObject();
       return result;
@@ -40,7 +41,7 @@ export class AuthService {
     };
   }
 
-  async register(registerDto: RegisterDto) {
+  async register(registerDto: CreateUserDto) {
     const userCount = await this.usersService.countUsers();
     const isFirstUser = userCount === 0;
 
@@ -78,7 +79,7 @@ export class AuthService {
     const userDataWithHash = {
       ...userData,
       password: hashedPassword,
-      role: UserRole.USER,
+      role: userData.role || UserRole.USER,
     };
 
     const user = await this.usersService.create(userDataWithHash);
@@ -90,7 +91,7 @@ export class AuthService {
     };
   }
 
-  async registerEnterprise(registerDto: RegisterDto) {
+  async registerEnterprise(registerDto: CreateUserDto) {
     const existingUser = await this.usersService.findByEmail(registerDto.email);
     if (existingUser) {
       throw new ConflictException('Email já está em uso');
