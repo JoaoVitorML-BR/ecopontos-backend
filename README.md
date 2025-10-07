@@ -78,3 +78,17 @@ src/
 
 - `GET /` - Mensagem de boas-vindas
 - `GET /health` - Status de saúde da aplicação
+
+## Documentação Swagger
+
+Esta aplicação possui documentação automática das rotas via Swagger.
+
+Após subir o backend, acesse:
+
+```
+http://localhost:3001/api
+```
+
+Você poderá visualizar, testar e explorar todas as rotas da API diretamente pelo navegador.
+
+Para adicionar/atualizar a documentação, utilize os decorators do NestJS Swagger (`@ApiTags`, `@ApiOperation`, `@ApiResponse`, etc.) nos controllers e DTOs.
