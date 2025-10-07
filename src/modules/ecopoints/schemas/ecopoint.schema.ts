@@ -14,7 +14,8 @@ export const EcoPointSchema = new Schema<IEcoPoint, IEcoPointModel>({
     },
     cnpj: {
         type: String,
-        required: [true, 'CNPJ é obrigatório']
+        required: [true, 'CNPJ é obrigatório'],
+        unique: true
     },
     opening_hours: {
         type: String,
@@ -35,6 +36,11 @@ export const EcoPointSchema = new Schema<IEcoPoint, IEcoPointModel>({
     coordinates: {
         type: String,
         required: [true, 'Coordenadas são obrigatórias']
+    },
+    companyId: {
+        type: String,
+        ref: 'User',
+        required: true
     }
 }, {
     timestamps: true,
