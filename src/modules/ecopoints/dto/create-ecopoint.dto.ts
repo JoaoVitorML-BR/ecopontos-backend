@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsArray } from 'class-validator';
+import { IsNotEmpty, IsString, IsArray, Matches } from 'class-validator';
 
 export class CreateEcoPointDto {
   @IsNotEmpty({ message: 'Título é obrigatório' })
@@ -28,5 +28,8 @@ export class CreateEcoPointDto {
 
   @IsNotEmpty({ message: 'Coordenadas são obrigatórias' })
   @IsString({ message: 'Coordenadas devem ser uma string' })
+  @Matches(/^[-+]?\d{1,2}\.\d+,\s*[-+]?\d{1,3}\.\d+$/, {
+    message: 'Coordenadas devem estar no formato: latitude,longitude (ex: -9.741951520552348,-36.660397991379185)',
+  })
   coordinates: string;
 }
