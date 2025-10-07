@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 
@@ -19,10 +19,28 @@ export class HttpClientService {
       }
 
       const response = await firstValueFrom(
-        this.httpService.get(`https://www.receitaws.com.br/v1/cnpj/${cleanedCnpj}`)
+        this.httpService.get(
+          `https://brasilapi.com.br/api/cnpj/v1/${cleanedCnpj}`,
+          {
+            headers: {
+              'User-Agent': 'NestJS-HttpClient/1.0',
+              'Accept': 'application/json'
+            }
+          }
+        )
       );
+
+      if (response.status !== 200) {
+        throw new Error('CNPJ não encontrado ou inválido na BrasilAPI.');
+      }
       return response.data;
     } catch (error) {
+      if (error?.response?.status === 429) {
+        throw new Error('Serviço de validação de CNPJ está temporariamente indisponível. Tente novamente mais tarde.');
+      }
+      if (error?.response?.status === 400) {
+        throw new BadRequestException('CNPJ inválido ou não encontrado na BrasilAPI.');
+      }
       throw new Error(`Erro ao validar CNPJ: ${error.message}`);
     }
   }
