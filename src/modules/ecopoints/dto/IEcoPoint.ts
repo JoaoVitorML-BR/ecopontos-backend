@@ -9,6 +9,7 @@ export interface IEcoPoint {
     accepted_materials: string[];
     address: string;
     coordinates: string;
+    companyId: string;
 }
 
 export interface IEcoPointDocument extends Omit<IEcoPoint, 'id'>, Document {
