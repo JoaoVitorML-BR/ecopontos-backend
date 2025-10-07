@@ -97,4 +97,8 @@ export class UsersService {
       console.error('Erro ao criar admin padrão:', error);
     }
   }
+
+  async findByRole(role: string): Promise<UserDocument[]> {
+    return this.userModel.find({ role }).exec();
+  }
 }
