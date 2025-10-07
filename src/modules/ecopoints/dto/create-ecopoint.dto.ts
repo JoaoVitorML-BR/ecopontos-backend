@@ -1,6 +1,8 @@
 import { IsNotEmpty, IsString, IsArray, Matches } from 'class-validator';
 
 export class CreateEcoPointDto {
+  companyId: string;
+
   @IsNotEmpty({ message: 'Título é obrigatório' })
   @IsString({ message: 'Título deve ser uma string' })
   title: string;
