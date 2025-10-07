@@ -1,11 +1,11 @@
 import { Controller, Post, Body, UseGuards, Request, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
-import { RegisterDto } from './dto/register.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { AdminGuard } from './guards/admin.guard';
 import { UsersService } from '../users/users.service';
+import { CreateUserDto } from '../users/dto/create-user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -15,20 +15,19 @@ export class AuthController {
   ) { }
 
   @Post('register')
-  async register(@Body() registerDto: RegisterDto) {
+  async register(@Body() registerDto: CreateUserDto) {
     return this.authService.register(registerDto);
   }
 
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Post('register-enterprise')
-  async registerEnterprise(@Body() registerDto: RegisterDto) {
-    const userData = { ...registerDto, role: 'enterprise', approved: false };
+  async registerEnterprise(@Body() registerDto: CreateUserDto) {
+    const userData = { ...registerDto, role: 'enterprise', approved: true };
     return this.authService.registerEnterprise(userData);
   }
 
-  @UseGuards(JwtAuthGuard, AdminGuard)
   @Post('register-admin')
-  async registerAdmin(@Body() registerDto: RegisterDto) {
+  async registerAdmin(@Body() registerDto: CreateUserDto) {
     const userData = {
       ...registerDto,
       role: 'admin',
@@ -39,6 +38,7 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(@Body() loginDto: LoginDto) {
+    console.log(loginDto);
     return this.authService.login(loginDto);
   }
 
