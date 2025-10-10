@@ -1,13 +1,7 @@
 import { model, Schema } from 'mongoose';
 import { IEcoPoint, IEcoPointModel } from '../dto/IEcoPoint';
-import { v4 as uuidv4 } from 'uuid';
 
 export const EcoPointSchema = new Schema<IEcoPoint, IEcoPointModel>({
-    id: {
-        type: String,
-        default: uuidv4,
-        unique: true
-    },
     title: {
         type: String,
         required: [true, 'Título é obrigatório']
@@ -38,7 +32,7 @@ export const EcoPointSchema = new Schema<IEcoPoint, IEcoPointModel>({
         required: [true, 'Coordenadas são obrigatórias']
     },
     companyId: {
-        type: String,
+        type: Schema.Types.ObjectId,
         ref: 'User',
         required: true
     }

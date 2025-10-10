@@ -1,7 +1,7 @@
-import { Document, Model } from 'mongoose';
+import { Document, Model, Types } from 'mongoose';
 
 export interface IEcoPoint {
-    id: string;
+    _id: Types.ObjectId;
     title: string;
     cnpj: string;
     opening_hours: string;
@@ -9,13 +9,13 @@ export interface IEcoPoint {
     accepted_materials: string[];
     address: string;
     coordinates: string;
-    companyId: string;
+    companyId: Types.ObjectId;
 }
 
-export interface IEcoPointDocument extends Omit<IEcoPoint, 'id'>, Document {
-    id: string;
+export interface IEcoPointDocument extends Omit<IEcoPoint, '_id'>, Document {
+    _id: Types.ObjectId;
     createdAt: Date;
     updatedAt: Date;
 }
 
-export interface IEcoPointModel extends Model<IEcoPointDocument> {}
+export interface IEcoPointModel extends Model<IEcoPointDocument> { }

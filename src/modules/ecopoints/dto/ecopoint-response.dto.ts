@@ -1,5 +1,6 @@
 export class EcoPointResponseDto {
   id: string;
+  companyId: string;
   title: string;
   cnpj: string;
   opening_hours: string;

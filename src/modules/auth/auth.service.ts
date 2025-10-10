@@ -101,8 +101,7 @@ export class AuthService {
     const userData = {
       ...registerDto,
       password: hashedPassword,
-      role: UserRole.ENTERPRISE,
-      approved: false,
+      role: UserRole.ENTERPRISE
     };
 
     const user = await this.usersService.create(userData);
