@@ -11,6 +11,7 @@ export class RequestCollectionService {
         @InjectModel('RequestCollection') private requestCollectionModel: Model<any>,
         private readonly ecoPointsService: EcoPointsService
     ) { }
+
     async getEcoPointById(ecopointId: string): Promise<any> {
         return this.ecoPointsService.findOne(ecopointId);
     }
@@ -32,6 +33,10 @@ export class RequestCollectionService {
 
     async findByUser(userId: string): Promise<any[]> {
         return this.requestCollectionModel.find({ userId }).exec();
+    }
+
+    async findById(id: string): Promise<any> {
+        return this.requestCollectionModel.findById(id).exec();
     }
 
     async updateStatus(id: string, statusDto: UpdateRequestCollectionStatusDto, companyId: string): Promise<any> {

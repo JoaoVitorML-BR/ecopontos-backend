@@ -9,7 +9,8 @@ import {
     Patch,
     NotFoundException,
     UsePipes,
-    ValidationPipe
+    ValidationPipe,
+    ForbiddenException
 } from '@nestjs/common';
 import { RequestCollectionService } from './request-collection.service';
 import { CreateRequestCollectionDto } from './dto/create-request-collection.dto';
@@ -33,13 +34,19 @@ export class RequestCollectionController {
 
     @UseGuards(JwtAuthGuard)
     @Get('company/:companyId')
-    async findByCompany(@Param('companyId') companyId: string) {
+    async findByCompany(@Param('companyId') companyId: string, @Req() req) {
+        if (req.user.userId !== companyId) {
+            throw new ForbiddenException('Acesso restrito à empresa responsável.');
+        }
         return this.service.findByCompany(companyId);
     }
 
     @UseGuards(JwtAuthGuard)
     @Get('user/:userId')
-    async findByUser(@Param('userId') userId: string) {
+    async findByUser(@Param('userId') userId: string, @Req() req) {
+        if (req.user.userId !== userId) {
+            throw new ForbiddenException('Acesso restrito ao usuario responsável.');
+        }
         return this.service.findByUser(userId);
     }
 
@@ -50,6 +57,13 @@ export class RequestCollectionController {
         @Body() statusDto: UpdateRequestCollectionStatusDto,
         @Req() req
     ) {
+        const request = await this.service.findById(id);
+        if (!request) {
+            throw new NotFoundException('Solicitação de coleta não encontrada');
+        }
+        if (request.companyId.toString() !== req.user.userId) {
+            throw new ForbiddenException('Apenas a empresa responsável pode atualizar o status.');
+        }
         return this.service.updateStatus(id, statusDto, req.user.userId);
     }
 }
