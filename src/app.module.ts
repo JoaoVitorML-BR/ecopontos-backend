@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { EcoPointsModule } from './modules/ecopoints/ecopoints.module';
+import { RequestCollectionModule } from './modules/request-collection/request-collection.module';
 import { UsersModule } from './modules/users/users.module';
 import { ExternalModule } from './modules/external/external.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -16,10 +17,11 @@ import { CommonModule } from './common/common.module';
     CommonModule,
     AuthModule,
     EcoPointsModule,
+    RequestCollectionModule,
     UsersModule,
     ExternalModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
