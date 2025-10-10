@@ -9,28 +9,28 @@ import { EcoPointResponseDto } from './dto/ecopoint-response.dto';
 @Injectable()
 export class EcoPointsService {
   async updateWithPermission(id: string, updateEcoPointDto: UpdateEcoPointDto, userId: string): Promise<EcoPointResponseDto> {
-    const ecoPoint = await this.ecoPointModel.findOne({ id }).exec();
+    const ecoPoint = await this.ecoPointModel.findById(id).exec();
     if (!ecoPoint) {
       throw new NotFoundException('EcoPoint não encontrado');
     }
-    if (ecoPoint.companyId !== userId) {
+    if (ecoPoint.companyId.toString() !== userId) {
       throw new ForbiddenException('Você não tem permissão para editar este ecoponto.');
     }
     const updatedEcoPoint = await this.ecoPointModel
-      .findOneAndUpdate({ id }, updateEcoPointDto, { new: true })
+      .findByIdAndUpdate(id, updateEcoPointDto, { new: true })
       .exec();
     return this.toResponseDto(updatedEcoPoint);
   }
 
   async removeWithPermission(id: string, userId: string): Promise<void> {
-    const ecoPoint = await this.ecoPointModel.findOne({ id }).exec();
+    const ecoPoint = await this.ecoPointModel.findById(id).exec();
     if (!ecoPoint) {
       throw new NotFoundException('EcoPoint não encontrado');
     }
-    if (ecoPoint.companyId !== userId) {
+    if (ecoPoint.companyId.toString() !== userId) {
       throw new ForbiddenException('Você não tem permissão para deletar este ecoponto.');
     }
-    await this.ecoPointModel.findOneAndDelete({ id }).exec();
+    await this.ecoPointModel.findByIdAndDelete(id).exec();
   }
   constructor(
     @InjectModel('EcoPoint') private ecoPointModel: IEcoPointModel,
@@ -53,7 +53,7 @@ export class EcoPointsService {
   }
 
   async findOne(id: string): Promise<EcoPointResponseDto> {
-    const ecoPoint = await this.ecoPointModel.findOne({ id }).exec();
+    const ecoPoint = await this.ecoPointModel.findById(id).exec();
     if (!ecoPoint) {
       throw new NotFoundException('EcoPoint não encontrado');
     }
@@ -67,7 +67,7 @@ export class EcoPointsService {
 
   async update(id: string, updateEcoPointDto: UpdateEcoPointDto): Promise<EcoPointResponseDto> {
     const ecoPoint = await this.ecoPointModel
-      .findOneAndUpdate({ id }, updateEcoPointDto, { new: true })
+      .findByIdAndUpdate(id, updateEcoPointDto, { new: true })
       .exec();
 
     if (!ecoPoint) {
@@ -78,7 +78,7 @@ export class EcoPointsService {
   }
 
   async remove(id: string): Promise<void> {
-    const result = await this.ecoPointModel.findOneAndDelete({ id }).exec();
+    const result = await this.ecoPointModel.findByIdAndDelete(id).exec();
     if (!result) {
       throw new NotFoundException('EcoPoint não encontrado');
     }
@@ -91,8 +91,8 @@ export class EcoPointsService {
 
   private toResponseDto(ecoPoint: IEcoPointDocument): EcoPointResponseDto {
     return {
-      id: ecoPoint.id,
-      companyId: ecoPoint.companyId,
+      id: ecoPoint._id ? ecoPoint._id.toString() : '',
+      companyId: ecoPoint.companyId ? ecoPoint.companyId.toString() : '',
       title: ecoPoint.title,
       cnpj: ecoPoint.cnpj,
       opening_hours: ecoPoint.opening_hours,

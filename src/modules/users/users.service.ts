@@ -13,9 +13,6 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto): Promise<UserDocument> {
     let userData: any = { ...createUserDto };
-    if (userData.role === 'enterprise') {
-      userData.approved = false;
-    }
     const user = new this.userModel(userData);
     return user.save();
   }
@@ -73,30 +70,30 @@ export class UsersService {
     }
   }
 
-  async createDefaultAdmin(): Promise<void> {
-    try {
-      const existingAdmin = await this.userModel.findOne({
-        role: 'admin'
-      }).exec();
+  // async createDefaultAdmin(): Promise<void> {
+  //   try {
+  //     const existingAdmin = await this.userModel.findOne({
+  //       role: 'admin'
+  //     }).exec();
 
-      if (!existingAdmin) {
-        const hashedPassword = await bcrypt.hash('123456', 10);
+  //     if (!existingAdmin) {
+  //       const hashedPassword = await bcrypt.hash('123456', 10);
 
-        const admin = new this.userModel({
-          name: 'Admin',
-          email: 'admin@admin.com',
-          password: hashedPassword,
-          role: 'admin'
-        });
+  //       const admin = new this.userModel({
+  //         name: 'Admin',
+  //         email: 'admin@admin.com',
+  //         password: hashedPassword,
+  //         role: 'admin'
+  //       });
 
-        await admin.save();
-      } else {
-        console.log('Admin já existe no sistema');
-      }
-    } catch (error) {
-      console.error('Erro ao criar admin padrão:', error);
-    }
-  }
+  //       await admin.save();
+  //     } else {
+  //       console.log('Admin já existe no sistema');
+  //     }
+  //   } catch (error) {
+  //     console.error('Erro ao criar admin padrão:', error);
+  //   }
+  // }
 
   async findByRole(role: string): Promise<UserDocument[]> {
     return this.userModel.find({ role }).exec();
