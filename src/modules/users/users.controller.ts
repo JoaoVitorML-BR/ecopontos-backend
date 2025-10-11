@@ -12,17 +12,21 @@ import {
   UsePipes,
   ValidationPipe
 } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AdminGuard } from '../auth/guards/admin.guard';
 
+@ApiTags('Usuários')
 @Controller('users')
 @UsePipes(new ValidationPipe({ transform: true }))
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
   @Get()
+  @ApiOperation({ summary: 'Listar todos os usuários' })
+  @ApiResponse({ status: 200, description: 'Lista de usuários.' })
   async findAll() {
     const users = await this.usersService.findAll();
     return users.map(user => ({
@@ -37,6 +41,10 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
+  @ApiOperation({ summary: 'Buscar usuário por ID' })
+  @ApiParam({ name: 'id', type: String })
+  @ApiResponse({ status: 200, description: 'Usuário encontrado.' })
+  @ApiResponse({ status: 403, description: 'Sem permissão para acessar este usuário.' })
   async findOne(@Param('id') id: string, @Req() req) {
     const isAuth = req.user;
     if (!isAuth || (isAuth.userId !== id && isAuth.role !== 'admin')) {
@@ -55,6 +63,10 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Get('name/:name')
+  @ApiOperation({ summary: 'Buscar usuário por nome (apenas admin)' })
+  @ApiParam({ name: 'name', type: String })
+  @ApiResponse({ status: 200, description: 'Usuário encontrado.' })
+  @ApiResponse({ status: 403, description: 'Sem permissão para acessar este usuário.' })
   async findByName(@Param('name') name: string, @Req() req) {
     const isAuth = req.user;
     if (!isAuth || (isAuth.role !== 'admin')) {
@@ -71,6 +83,9 @@ export class UsersController {
   }
 
   @Get('validate/:id')
+  @ApiOperation({ summary: 'Validar usuário por ID' })
+  @ApiParam({ name: 'id', type: String })
+  @ApiResponse({ status: 200, description: 'Validação do usuário.' })
   async validateUser(@Param('id') id: string) {
     const isValid = await this.usersService.validateUser(id);
     return {
@@ -82,6 +97,10 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
+  @ApiOperation({ summary: 'Deletar usuário por ID' })
+  @ApiParam({ name: 'id', type: String })
+  @ApiResponse({ status: 200, description: 'Usuário excluído com sucesso.' })
+  @ApiResponse({ status: 403, description: 'Sem permissão para deletar este usuário.' })
   async deleteUser(@Param('id') id: string, @Req() req) {
     const user = req.user;
     if (user.userId !== id && user.role !== 'admin') {
@@ -94,6 +113,11 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @Put(':id')
+  @ApiOperation({ summary: 'Atualizar usuário por ID' })
+  @ApiParam({ name: 'id', type: String })
+  @ApiBody({ type: UpdateUserDto })
+  @ApiResponse({ status: 200, description: 'Usuário atualizado com sucesso.' })
+  @ApiResponse({ status: 403, description: 'Sem permissão para atualizar este usuário.' })
   async updateUser(
     @Param('id') id: string,
     @Body() updateData: UpdateUserDto,
@@ -116,18 +140,24 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Get('role/admin')
+  @ApiOperation({ summary: 'Listar todos os administradores' })
+  @ApiResponse({ status: 200, description: 'Lista de administradores.' })
   async getAdmins() {
     return this.usersService.findByRole('admin');
   }
 
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Get('role/user')
+  @ApiOperation({ summary: 'Listar todos os clientes' })
+  @ApiResponse({ status: 200, description: 'Lista de clientes.' })
   async getClients() {
     return this.usersService.findByRole('user');
   }
 
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Get('role/enterprise')
+  @ApiOperation({ summary: 'Listar todas as empresas' })
+  @ApiResponse({ status: 200, description: 'Lista de empresas.' })
   async getEnterprises() {
     return this.usersService.findByRole('enterprise');
   }
