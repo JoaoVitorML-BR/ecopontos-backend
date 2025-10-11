@@ -61,8 +61,17 @@ docker-compose logs -f api
 docker-compose down
 ```
 
-A aplicação estará disponível em `http://localhost:3000`
+
+A aplicação estará disponível em `http://localhost:3001`
 O MongoDB estará disponível em `localhost:27017`
+
+## Gerenciamento do Banco de Dados
+
+Para acessar a interface web de administração do banco de dados MongoDB, utilize o mongo-express:
+
+- Interface de administração: [`http://localhost:8081`](http://localhost:8081)
+
+Por meio dessa interface, é possível visualizar, editar e gerenciar os dados do banco de forma prática pelo navegador.
 
 ## Estrutura do Projeto
 
