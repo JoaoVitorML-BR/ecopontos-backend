@@ -73,6 +73,33 @@ Para acessar a interface web de administração do banco de dados MongoDB, utili
 
 Por meio dessa interface, é possível visualizar, editar e gerenciar os dados do banco de forma prática pelo navegador.
 
+### Solução de Problemas Comuns
+
+**Erro de autenticação no mongo-express após clonar o projeto:**
+
+Se você clonou este projeto e está enfrentando erros como "Authentication failed" no mongo-express, siga estes passos:
+
+1. Certifique-se que o arquivo `.env` está configurado corretamente com as credenciais:
+   ```
+   DB_USER=admin
+   DB_PASS=12345
+   DB_NAME=eco_arapiraca
+   JWT_SECRET=eco_arapiraca_jwt_secret_2025_7x9k2m5n8q1w4e6r3t7y9u0i2o5p8a1s
+   ```
+
+2. Se o erro persistir, remova os volumes do Docker e recrie os containers:
+   ```bash
+   docker-compose down
+   docker volume rm eco_arapiraca_backend_nest_mongo_data
+   docker-compose up -d --build
+   ```
+
+**Erro 401 ao tentar acessar rotas protegidas:**
+
+- Certifique-se que a variável `JWT_SECRET` está definida no arquivo `.env`
+- Faça login com um usuário válido e use o token retornado no header `Authorization: Bearer <token>`
+- Para acessar rotas administrativas (como `POST /auth/register-enterprise`), é necessário um token de usuário com `role: admin`
+
 ## Estrutura do Projeto
 
 ```

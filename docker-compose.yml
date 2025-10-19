@@ -33,15 +33,16 @@ services:
   mongo-express:
     image: mongo-express
     restart: always
+    depends_on:
+      - mongodb
+    env_file:
+      - .env
     ports:
       - "8081:8081"
     environment:
       ME_CONFIG_BASICAUTH: 'false'
-      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
-      ME_CONFIG_MONGODB_ADMINPASSWORD: 12345
-      ME_CONFIG_MONGODB_SERVER: mongodb
-      ME_CONFIG_MONGODB_PORT: 27017
-      ME_CONFIG_MONGODB_AUTH_DATABASE: admin
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: 'true'
+      ME_CONFIG_MONGODB_URL: mongodb://${DB_USER}:${DB_PASS}@mongodb:27017/${DB_NAME}?authSource=admin
 
 volumes:
   mongo_data:
