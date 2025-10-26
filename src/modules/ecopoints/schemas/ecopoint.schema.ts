@@ -9,7 +9,7 @@ export const EcoPointSchema = new Schema<IEcoPoint, IEcoPointModel>({
     cnpj: {
         type: String,
         required: [true, 'CNPJ é obrigatório'],
-        unique: true
+        unique: false
     },
     opening_hours: {
         type: String,

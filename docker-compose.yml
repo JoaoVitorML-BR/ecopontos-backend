@@ -40,6 +40,7 @@ services:
     ports:
       - "8081:8081"
     environment:
+      PORT: 8081
       ME_CONFIG_BASICAUTH: 'false'
       ME_CONFIG_MONGODB_ENABLE_ADMIN: 'true'
       ME_CONFIG_MONGODB_URL: mongodb://${DB_USER}:${DB_PASS}@mongodb:27017/${DB_NAME}?authSource=admin

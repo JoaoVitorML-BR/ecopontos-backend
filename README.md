@@ -69,9 +69,11 @@ O MongoDB estará disponível em `localhost:27017`
 
 Para acessar a interface web de administração do banco de dados MongoDB, utilize o mongo-express:
 
-- Interface de administração: [`http://localhost:8081`](http://localhost:8081)
+- Interface de administração: [`http://localhost:8090`](http://localhost:8090)
 
 Por meio dessa interface, é possível visualizar, editar e gerenciar os dados do banco de forma prática pelo navegador.
+
+> **Nota:** Se a porta 8090 estiver ocupada na sua máquina, você pode alterá-la no `docker-compose.yml` na linha `ports: - "8090:8081"`. Mude o primeiro número (8090) para outra porta livre, como 9090, 7000 ou 5555.
 
 ### Solução de Problemas Comuns
 
