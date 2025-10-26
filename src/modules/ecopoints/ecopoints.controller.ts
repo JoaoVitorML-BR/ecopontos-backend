@@ -57,11 +57,10 @@ export class EcoPointsController {
   }
 
   @Get('cnpj/:cnpj')
-  @ApiOperation({ summary: 'Buscar ecoponto por CNPJ' })
+  @ApiOperation({ summary: 'Buscar ecopontos por CNPJ' })
   @ApiParam({ name: 'cnpj', type: String })
-  @ApiResponse({ status: 200, description: 'Ecoponto encontrado.', type: EcoPointResponseDto })
-  @ApiResponse({ status: 404, description: 'Ecoponto não encontrado.' })
-  async findByCnpj(@Param('cnpj') cnpj: string): Promise<EcoPointResponseDto | null> {
+  @ApiResponse({ status: 200, description: 'Lista de ecopontos encontrados.', type: [EcoPointResponseDto] })
+  async findByCnpj(@Param('cnpj') cnpj: string): Promise<EcoPointResponseDto[]> {
     return this.ecoPointsService.findByCnpj(cnpj);
   }
 

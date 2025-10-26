@@ -60,9 +60,9 @@ export class EcoPointsService {
     return this.toResponseDto(ecoPoint);
   }
 
-  async findByCnpj(cnpj: string): Promise<EcoPointResponseDto | null> {
-    const ecoPoint = await this.ecoPointModel.findOne({ cnpj }).exec();
-    return ecoPoint ? this.toResponseDto(ecoPoint) : null;
+  async findByCnpj(cnpj: string): Promise<EcoPointResponseDto[]> {
+    const ecoPoints = await this.ecoPointModel.find({ cnpj }).exec();
+    return ecoPoints.map(ecoPoint => this.toResponseDto(ecoPoint));
   }
 
   async update(id: string, updateEcoPointDto: UpdateEcoPointDto): Promise<EcoPointResponseDto> {
