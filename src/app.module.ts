@@ -8,6 +8,7 @@ import { UsersModule } from './modules/users/users.module';
 import { ExternalModule } from './modules/external/external.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { CommonModule } from './common/common.module';
+import { ReclamacaoModule } from './reclamacao/reclamacao.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { CommonModule } from './common/common.module';
     RequestCollectionModule,
     UsersModule,
     ExternalModule,
+    ReclamacaoModule,
   ],
   controllers: [AppController],
   providers: [AppService],
