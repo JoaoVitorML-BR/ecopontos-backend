@@ -15,6 +15,8 @@ Backend desenvolvido em NestJS para o projeto Eco Arapiraca.
 - Docker e Docker Compose
 - Node.js (versão 18 ou superior) - para desenvolvimento local
 - npm ou yarn
+ 
+Recomendado: Git (para controlar versões) e um editor como VS Code.
 
 ## Configuração
 
@@ -116,6 +118,83 @@ src/
 
 - `GET /` - Mensagem de boas-vindas
 - `GET /health` - Status de saúde da aplicação
+
+## Desenvolvimento local (sem Docker)
+
+Se preferir rodar localmente sem Docker, instale o Node.js e o MongoDB localmente e execute:
+
+```powershell
+npm install
+# configurar .env conforme descrito acima
+npm run start:dev
+```
+
+O servidor em modo de desenvolvimento utiliza `nodemon` (ou `ts-node-dev`) conforme a configuração do `package.json`.
+
+## Testes
+
+O projeto usa Jest (via `ts-jest`) para testes unitários.
+
+- Executar testes:
+
+```powershell
+npm test
+```
+
+- Executar cobertura e gerar relatório HTML:
+
+```powershell
+npm run test:cov
+
+# Abra em um navegador o arquivo gerado:
+# coverage/lcov-report/index.html
+```
+
+## Variáveis de ambiente (principais)
+
+Exemplos / obrigatórias (algumas dependem das features que você for usar):
+
+```env
+# Mongo (opcional: forneça DB_USER/DB_PASS/DB_NAME ou MONGO_URI direto)
+DB_USER=admin
+DB_PASS=12345
+DB_NAME=eco_arapiraca
+# ou
+MONGO_URI=mongodb://admin:12345@localhost:27017/eco_arapiraca?authSource=admin
+
+# Aplicação
+NODE_ENV=development
+PORT=3001
+JWT_SECRET=eco_arapiraca_jwt_secret_... (escolha algo seguro)
+
+# Nodemailer (para enviar reclamações)
+EMAIL_USER=seu-email@gmail.com
+EMAIL_PASS=sua-senha-ou-app-password
+
+# (Frontend) chave pública do Google Maps — usada no frontend Next.js
+NEXT_PUBLIC_MAPS_API_KEY=YOUR_GOOGLE_MAPS_API_KEY
+```
+
+Nota sobre Gmail: se for usar Gmail para envio de e-mails, recomenda-se criar uma App Password (para contas com 2FA) ou configurar permissões adequadas — evitar usar a senha principal diretamente em produção.
+
+## Observações sobre cobertura
+
+Os testes atuais cobrem muitos serviços principais, mas alguns controllers e módulos de inicialização possuem 0% de cobertura — adicione testes focados em controllers/rotas para aumentar o percentual global de cobertura.
+
+## Contribuição
+
+1. Crie um branch para sua feature/fix:
+
+```bash
+git checkout -b feat/minha-nova-coisa
+```
+
+2. Faça commits pequenos e descritivos.
+3. Abra um Pull Request no GitHub para revisão.
+
+---
+
+Se quiser, eu posso: gerar um relatório de cobertura para arquivos com 0%, adicionar testes para controllers com maior impacto (por exemplo `ecopoints.controller.ts`) ou suprimir logs durante os testes. Qual prefere que eu faça a seguir?
 
 ## Documentação Swagger
 
