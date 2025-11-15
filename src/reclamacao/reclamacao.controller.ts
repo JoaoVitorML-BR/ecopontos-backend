@@ -33,7 +33,7 @@ export class ReclamacaoController {
         cc: email,
         subject: `Nova reclamação de ${nome}`,
         text: `
-Você enviou uma reclamação ao sistema Eco Arapiraca:
+Você enviou uma reclamação ao sistema Ecopontos Arapiraca:
 
 Nome: ${nome}
 Email: ${email}
