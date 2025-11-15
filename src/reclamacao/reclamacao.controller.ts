@@ -27,14 +27,25 @@ export class ReclamacaoController {
     try {
       console.log('🚀 Tentando enviar e-mail...');
       await this.transporter.sendMail({
-        from: process.env.EMAIL_USER, // usa o seu email, não o do usuário
+        from: process.env.EMAIL_USER,
         replyTo: email,
         to: process.env.EMAIL_USER,
+        cc: email,
         subject: `Nova reclamação de ${nome}`,
-        text: mensagem,
+        text: `
+Você enviou uma reclamação ao sistema Eco Arapiraca:
+
+Nome: ${nome}
+Email: ${email}
+Mensagem:
+${mensagem}
+
+Obrigado por entrar em contato!
+        `,
       });
+
       console.log('✅ E-mail enviado!');
-      return { success: true, message: 'Reclamação enviada com sucesso!' };
+      return { success: true, message: 'Reclamação enviada com sucesso! Uma cópia foi enviada para o seu e-mail.' };
     } catch (error) {
       console.error('❌ Erro ao enviar e-mail:', error);
       throw new InternalServerErrorException('Erro ao enviar e-mail.');
