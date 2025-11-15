@@ -43,12 +43,19 @@ export class RequestCollectionService {
         const request = await this.requestCollectionModel.findById(id);
         if (!request) throw new NotFoundException('Solicitação não encontrada');
         if (request.companyId.toString() !== companyId) throw new ForbiddenException('Acesso negado');
-        request.status = statusDto.status;
+
+        const update: any = { status: statusDto.status };
         if (statusDto.status === 'em_coleta') {
-            request.notified = true;
-            request.notifiedAt = new Date();
+            update.notified = true;
+            update.notifiedAt = new Date();
         }
-        await request.save();
-        return request;
+
+        try {
+            const updated = await this.requestCollectionModel.findByIdAndUpdate(id, { $set: update }, { new: true }).exec();
+            return updated;
+        } catch (error) {
+            console.error('Error updating request status', { id, update, error: error instanceof Error ? error.stack : error });
+            throw error;
+        }
     }
 }
