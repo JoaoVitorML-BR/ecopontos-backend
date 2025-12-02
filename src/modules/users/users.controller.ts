@@ -26,7 +26,20 @@ export class UsersController {
 
   @Get()
   @ApiOperation({ summary: 'Listar todos os usuários' })
-  @ApiResponse({ status: 200, description: 'Lista de usuários.' })
+  @ApiResponse({
+    status: 200, description: 'Lista de usuários.', schema: {
+      example: [
+        {
+          id: '1',
+          name: 'João Silva',
+          email: 'joao@exemplo.com',
+          role: 'user',
+          createdAt: '2023-01-01T12:00:00Z',
+          updatedAt: '2023-01-01T12:00:00Z'
+        }
+      ]
+    }
+  })
   async findAll() {
     const users = await this.usersService.findAll();
     return users.map(user => ({
@@ -43,8 +56,19 @@ export class UsersController {
   @Get(':id')
   @ApiOperation({ summary: 'Buscar usuário por ID' })
   @ApiParam({ name: 'id', type: String })
-  @ApiResponse({ status: 200, description: 'Usuário encontrado.' })
-  @ApiResponse({ status: 403, description: 'Sem permissão para acessar este usuário.' })
+  @ApiResponse({
+    status: 200, description: 'Usuário encontrado.', schema: {
+      example: {
+        id: '1',
+        name: 'João Silva',
+        email: 'joao@exemplo.com',
+        role: 'user',
+        createdAt: '2023-01-01T12:00:00Z',
+        updatedAt: '2023-01-01T12:00:00Z'
+      }
+    }
+  })
+  @ApiResponse({ status: 403, description: 'Sem permissão para acessar este usuário.', schema: { example: { success: false, message: 'Você não tem permissão para acessar este usuário.' } } })
   async findOne(@Param('id') id: string, @Req() req) {
     const isAuth = req.user;
     if (!isAuth || (isAuth.userId !== id && isAuth.role !== 'admin')) {
@@ -65,8 +89,16 @@ export class UsersController {
   @Get('name/:name')
   @ApiOperation({ summary: 'Buscar usuário por nome (apenas admin)' })
   @ApiParam({ name: 'name', type: String })
-  @ApiResponse({ status: 200, description: 'Usuário encontrado.' })
-  @ApiResponse({ status: 403, description: 'Sem permissão para acessar este usuário.' })
+  @ApiResponse({
+    status: 200, description: 'Usuário encontrado.', schema: {
+      example: {
+        id: '1',
+        name: 'João Silva'
+      }
+    }
+  })
+  @ApiResponse({ status: 404, description: 'Usuário não encontrado.', schema: { example: { message: 'Usuário não encontrado' } } })
+  @ApiResponse({ status: 403, description: 'Sem permissão para acessar este usuário.', schema: { example: { success: false, message: 'Você não tem permissão para acessar este usuário.' } } })
   async findByName(@Param('name') name: string, @Req() req) {
     const isAuth = req.user;
     if (!isAuth || (isAuth.role !== 'admin')) {
@@ -85,7 +117,15 @@ export class UsersController {
   @Get('validate/:id')
   @ApiOperation({ summary: 'Validar usuário por ID' })
   @ApiParam({ name: 'id', type: String })
-  @ApiResponse({ status: 200, description: 'Validação do usuário.' })
+  @ApiResponse({
+    status: 200, description: 'Validação do usuário.', schema: {
+      example: {
+        userId: '1',
+        isValid: true,
+        message: 'Usuário válido'
+      }
+    }
+  })
   async validateUser(@Param('id') id: string) {
     const isValid = await this.usersService.validateUser(id);
     return {
@@ -99,8 +139,8 @@ export class UsersController {
   @Delete(':id')
   @ApiOperation({ summary: 'Deletar usuário por ID' })
   @ApiParam({ name: 'id', type: String })
-  @ApiResponse({ status: 200, description: 'Usuário excluído com sucesso.' })
-  @ApiResponse({ status: 403, description: 'Sem permissão para deletar este usuário.' })
+  @ApiResponse({ status: 200, description: 'Usuário excluído com sucesso.', schema: { example: { message: 'Usuário excluído com sucesso' } } })
+  @ApiResponse({ status: 403, description: 'Sem permissão para deletar este usuário.', schema: { example: { success: false, message: 'Você não tem permissão para deletar este usuário.' } } })
   async deleteUser(@Param('id') id: string, @Req() req) {
     const user = req.user;
     if (user.userId !== id && user.role !== 'admin') {
@@ -115,9 +155,38 @@ export class UsersController {
   @Put(':id')
   @ApiOperation({ summary: 'Atualizar usuário por ID' })
   @ApiParam({ name: 'id', type: String })
-  @ApiBody({ type: UpdateUserDto })
-  @ApiResponse({ status: 200, description: 'Usuário atualizado com sucesso.' })
-  @ApiResponse({ status: 403, description: 'Sem permissão para atualizar este usuário.' })
+  @ApiBody({
+    type: UpdateUserDto,
+    examples: {
+      valid: {
+        summary: 'Exemplo válido',
+        value: {
+          name: 'Novo Nome',
+          email: 'novo@exemplo.com',
+        },
+      },
+      invalid: {
+        summary: 'Exemplo inválido',
+        value: {
+          name: '',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 200, description: 'Usuário atualizado com sucesso.', schema: {
+      example: {
+        id: '1',
+        name: 'Novo Nome',
+        email: 'novo@exemplo.com',
+        role: 'user',
+        createdAt: '2023-01-01T12:00:00Z',
+        updatedAt: '2023-01-01T12:00:00Z'
+      }
+    }
+  })
+  @ApiResponse({ status: 400, description: 'Dados inválidos.', schema: { example: { success: false, message: 'Nome é obrigatório' } } })
+  @ApiResponse({ status: 403, description: 'Sem permissão para atualizar este usuário.', schema: { example: { success: false, message: 'Você não tem permissão para atualizar este usuário.' } } })
   async updateUser(
     @Param('id') id: string,
     @Body() updateData: UpdateUserDto,
@@ -141,7 +210,20 @@ export class UsersController {
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Get('role/admin')
   @ApiOperation({ summary: 'Listar todos os administradores' })
-  @ApiResponse({ status: 200, description: 'Lista de administradores.' })
+  @ApiResponse({
+    status: 200, description: 'Lista de administradores.', schema: {
+      example: [
+        {
+          id: '1',
+          name: 'Admin',
+          email: 'admin@exemplo.com',
+          role: 'admin',
+          createdAt: '2023-01-01T12:00:00Z',
+          updatedAt: '2023-01-01T12:00:00Z'
+        }
+      ]
+    }
+  })
   async getAdmins() {
     return this.usersService.findByRole('admin');
   }
@@ -149,7 +231,20 @@ export class UsersController {
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Get('role/user')
   @ApiOperation({ summary: 'Listar todos os clientes' })
-  @ApiResponse({ status: 200, description: 'Lista de clientes.' })
+  @ApiResponse({
+    status: 200, description: 'Lista de clientes.', schema: {
+      example: [
+        {
+          id: '1',
+          name: 'João Silva',
+          email: 'joao@exemplo.com',
+          role: 'user',
+          createdAt: '2023-01-01T12:00:00Z',
+          updatedAt: '2023-01-01T12:00:00Z'
+        }
+      ]
+    }
+  })
   async getClients() {
     return this.usersService.findByRole('user');
   }
@@ -157,7 +252,20 @@ export class UsersController {
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Get('role/enterprise')
   @ApiOperation({ summary: 'Listar todas as empresas' })
-  @ApiResponse({ status: 200, description: 'Lista de empresas.' })
+  @ApiResponse({
+    status: 200, description: 'Lista de empresas.', schema: {
+      example: [
+        {
+          id: '1',
+          name: 'Empresa X',
+          email: 'empresa@exemplo.com',
+          role: 'enterprise',
+          createdAt: '2023-01-01T12:00:00Z',
+          updatedAt: '2023-01-01T12:00:00Z'
+        }
+      ]
+    }
+  })
   async getEnterprises() {
     return this.usersService.findByRole('enterprise');
   }

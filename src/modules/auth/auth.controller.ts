@@ -18,9 +18,30 @@ export class AuthController {
 
   @Post('register')
   @ApiOperation({ summary: 'Registrar novo usuário' })
-  @ApiBody({ type: CreateUserDto })
-  @ApiResponse({ status: 201, description: 'Usuário registrado com sucesso.' })
-  @ApiResponse({ status: 409, description: 'Email já está em uso.' })
+  @ApiBody({
+    type: CreateUserDto,
+    examples: {
+      valid: {
+        summary: 'Exemplo válido',
+        value: {
+          name: 'João Silva',
+          email: 'joao@exemplo.com',
+          password: 'Senha@123',
+        },
+      },
+      invalid: {
+        summary: 'Exemplo inválido',
+        value: {
+          name: '',
+          email: '',
+          password: '123',
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 201, description: 'Usuário registrado com sucesso.', schema: { example: { success: true, message: 'Usuário registrado com sucesso.' } } })
+  @ApiResponse({ status: 409, description: 'Email já está em uso.', schema: { example: { success: false, message: 'Email já está em uso.' } } })
+  @ApiResponse({ status: 400, description: 'Dados inválidos.', schema: { example: { success: false, message: 'Nome é obrigatório' } } })
   async register(@Body() registerDto: CreateUserDto) {
     return this.authService.register(registerDto);
   }
@@ -28,9 +49,29 @@ export class AuthController {
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Post('register-enterprise')
   @ApiOperation({ summary: 'Registrar empresa (apenas admin)' })
-  @ApiBody({ type: CreateUserDto })
-  @ApiResponse({ status: 201, description: 'Empresa registrada com sucesso.' })
-  @ApiResponse({ status: 401, description: 'Não autorizado.' })
+  @ApiBody({
+    type: CreateUserDto,
+    examples: {
+      valid: {
+        summary: 'Exemplo válido',
+        value: {
+          name: 'Empresa X',
+          email: 'empresa@exemplo.com',
+          password: 'Senha@123',
+        },
+      },
+      invalid: {
+        summary: 'Exemplo inválido',
+        value: {
+          name: '',
+          email: '',
+          password: '123',
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 201, description: 'Empresa registrada com sucesso.', schema: { example: { success: true, message: 'Empresa registrada com sucesso.' } } })
+  @ApiResponse({ status: 401, description: 'Não autorizado.', schema: { example: { success: false, message: 'Não autorizado.' } } })
   async registerEnterprise(@Body() registerDto: CreateUserDto) {
     const userData = { ...registerDto, role: 'enterprise', approved: true };
     return this.authService.registerEnterprise(userData);
@@ -38,9 +79,29 @@ export class AuthController {
 
   @Post('register-admin')
   @ApiOperation({ summary: 'Registrar admin (apenas admin)' })
-  @ApiBody({ type: CreateUserDto })
-  @ApiResponse({ status: 201, description: 'Admin registrado com sucesso.' })
-  @ApiResponse({ status: 401, description: 'Não autorizado.' })
+  @ApiBody({
+    type: CreateUserDto,
+    examples: {
+      valid: {
+        summary: 'Exemplo válido',
+        value: {
+          name: 'Admin',
+          email: 'admin@exemplo.com',
+          password: 'Senha@123',
+        },
+      },
+      invalid: {
+        summary: 'Exemplo inválido',
+        value: {
+          name: '',
+          email: '',
+          password: '123',
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 201, description: 'Admin registrado com sucesso.', schema: { example: { success: true, message: 'Admin registrado com sucesso.' } } })
+  @ApiResponse({ status: 401, description: 'Não autorizado.', schema: { example: { success: false, message: 'Não autorizado.' } } })
   async registerAdmin(@Body() registerDto: CreateUserDto) {
     const userData = {
       ...registerDto,
@@ -52,16 +113,34 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   @ApiOperation({ summary: 'Login do usuário' })
-  @ApiBody({ type: LoginDto })
-  @ApiResponse({ status: 201, description: 'Login realizado com sucesso.' })
-  @ApiResponse({ status: 401, description: 'Credenciais inválidas.' })
+  @ApiBody({
+    type: LoginDto,
+    examples: {
+      valid: {
+        summary: 'Exemplo válido',
+        value: {
+          email: 'joao@exemplo.com',
+          password: 'Senha@123',
+        },
+      },
+      invalid: {
+        summary: 'Exemplo inválido',
+        value: {
+          email: 'joao@exemplo.com',
+          password: '123',
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 201, description: 'Login realizado com sucesso.', schema: { example: { access_token: 'jwt.token.aqui' } } })
+  @ApiResponse({ status: 401, description: 'Credenciais inválidas.', schema: { example: { success: false, message: 'Credenciais inválidas.' } } })
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
   }
 
   @Get('check-first-user')
   @ApiOperation({ summary: 'Verifica se existe algum usuário cadastrado' })
-  @ApiResponse({ status: 200, description: 'Retorna se é o primeiro usuário.' })
+  @ApiResponse({ status: 200, description: 'Retorna se é o primeiro usuário.', schema: { example: { isFirstUser: true } } })
   async checkFirstUser() {
     const userCount = await this.usersService.countUsers();
     return { isFirstUser: userCount === 0 };
